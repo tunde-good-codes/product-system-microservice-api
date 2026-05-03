@@ -1,4 +1,6 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { User } from "apps/auth/src/entities/users.entity";
+import { Product } from "apps/product/src/entity/product.entity";
 
 export const getDatabaseConfig = (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -11,4 +13,5 @@ export const getDatabaseConfig = (): TypeOrmModuleOptions => ({
   database: process.env.DB_DATABASE || 'blog_posting_db',
 
   autoLoadEntities: true,
+  entities:[User, Product],
   synchronize: true});

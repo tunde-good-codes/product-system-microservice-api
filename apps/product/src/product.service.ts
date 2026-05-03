@@ -12,16 +12,16 @@ import { KAFKA_SERVICE } from "@app/kafka";
 import { ClientKafka } from "@nestjs/microservices";
 import { CreateProductDto } from "./dto/product.dto";
 import { Repository } from "typeorm";
-import { User } from "apps/auth/src/entities/users.entity";
 import { KAFKA_TOPICS } from "@app/kafka/constants/kafka.topics";
-import { AuthService } from "apps/auth/src/auth.service";
+import { User } from "apps/auth/src/entities/users.entity";
 
 @Injectable()
 export class ProductService implements OnModuleInit {
   constructor(
     @InjectRepository(Product) private readonly productRepository: Repository<Product>,
 
-    private readonly authService: AuthService,
+  @InjectRepository(User)           // ✅ inject User repo directly
+    private readonly userRepository: Repository<User >,
 
     @Inject(KAFKA_SERVICE) private readonly kafkaClient: ClientKafka
   ) {}
@@ -35,12 +35,6 @@ export class ProductService implements OnModuleInit {
 
   async createProduct(createProductDto: CreateProductDto, userId: string) {
     try {
-      const user = await this.authService.getOneUserById(userId);
-
-      if (!user) {
-        throw new NotFoundException("user no found");
-      }
-
       // if (
       //   createProductDto.price < 0 ||
       //   typeof createProductDto.price !== "number" ||
@@ -49,10 +43,15 @@ export class ProductService implements OnModuleInit {
       //   throw new BadRequestException("number must not be less than 0");
       // }
 
+        const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
       const newProduct = this.productRepository.create({
         ...createProductDto,
-        user: user.user
-      });
+user      });
 
       await this.productRepository.save(newProduct);
       this.kafkaClient.emit(KAFKA_TOPICS.PRODUCT_CREATED, {

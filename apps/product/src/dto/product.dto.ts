@@ -10,7 +10,7 @@ import {
   MinLength
 } from "class-validator";
 import { ProductStatus } from "../entity/product.entity";
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateProductDto {
 
@@ -33,6 +33,8 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
+  @Transform(({ value }) => value?.toUpperCase())
+
   status?: ProductStatus;
 
   @IsOptional()
