@@ -11,20 +11,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-      private readonly configService: ConfigService,
-
+    private readonly configService: ConfigService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-    secretOrKey: configService.getOrThrow<string>("JWT_SECRET"),
+      secretOrKey: configService.getOrThrow<string>("JWT_SECRET")
     });
   }
 
-  async validate(payload: { sub: string; email: string }) {
+  async validate(payload: { sub: string; email: string; role: string }) {
     const user = await this.userRepository.findOne({
       where: {
-        id: payload.sub
+        id: payload.sub,
       },
       select: {
         id: true,
@@ -34,7 +33,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
 
     if (!user) {
-throw new UnauthorizedException("Unauthorized user!");    }
+      throw new UnauthorizedException("Unauthorized user!");
+    }
     return user;
   }
 }

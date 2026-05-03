@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post } from "@nestjs/common";
+import { Body, Controller, Get, Headers, Post } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "apps/product/src/dto/product.dto";
 
@@ -8,11 +8,18 @@ export class ProductController {
 
   @Post()
   async createProduct(
-   @Body() createProductDto: CreateProductDto,
+    @Body() createProductDto: CreateProductDto,
     @Headers("authorization") authHeader: string
   ) {
     const token = authHeader.startsWith("Bearer ") ? authHeader : `Bearer ${authHeader}`;
-   
+
     return await this.productService.createProduct(createProductDto, token);
+  }
+
+  @Get()
+  async getProducts(@Headers("authorization") authToken: string) {
+    const formattedToken = authToken.startsWith("Bearer ") ? authToken : `Bearer ${authToken}`;
+
+    return await this.productService.getAllProduct(formattedToken);
   }
 }

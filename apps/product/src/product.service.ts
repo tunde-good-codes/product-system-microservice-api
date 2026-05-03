@@ -68,19 +68,22 @@ user      });
       throw new BadRequestException("Internal server error");
     }
   }
-
-  async getAllProducts() {
-    const products = await this.productRepository.find({});
-
-    if (!products) {
-      throw new BadRequestException("cant fetch product");
+async getAllProducts() {
+  const products = await this.productRepository.find({
+    order: {
+      createdAt: "ASC"
     }
+  });
 
-    return {
-      success: true,
-      products
-    };
+  if (!products || !products.length) {
+    throw new BadRequestException("cant fetch product");
   }
+
+  return {
+    success: true,
+    products
+  };
+}
 
   async getSingleProduct(id: string) {
     const product = await this.productRepository.findOne({

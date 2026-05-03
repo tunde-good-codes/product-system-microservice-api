@@ -49,7 +49,7 @@ export class AuthService implements OnModuleInit {
 
       await this.userRepository.save(user);
 
-      const tokens = await this.generateToken(user.id, user.email);
+      const tokens = await this.generateToken(user.id, user.email, user.role);
       await this.updateRefreshToken(user.id, tokens.refreshToken);
 
       this.kafkaClient.emit(KAFKA_TOPICS.USER_REGISTERED, {
@@ -92,7 +92,11 @@ export class AuthService implements OnModuleInit {
         throw new ConflictException("invalid email or password");
       }
 
-      const { accessToken, refreshToken } = await this.generateToken(user.id, user.email);
+      const { accessToken, refreshToken } = await this.generateToken(
+        user.id,
+        user.email,
+        user.role
+      );
       await this.updateRefreshToken(user.id, refreshToken);
 
       const { password, ...safeUser } = user;
@@ -114,9 +118,10 @@ export class AuthService implements OnModuleInit {
   }
   private async generateToken(
     userId: string,
-    email: string
+    email: string,
+    role: string
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const payload = { sub: userId, email };
+    const payload = { sub: userId, email, role };
     const refreshId = randomBytes(16).toString("hex");
 
     const [accessToken, refreshToken] = await Promise.all([

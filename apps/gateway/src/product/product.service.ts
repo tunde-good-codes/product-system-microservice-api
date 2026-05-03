@@ -1,6 +1,6 @@
 import { SERVICES_PORTS } from "@app/common/constants/services.contants";
 import { HttpService } from "@nestjs/axios";
-import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { ProductDataContext } from "apps/product/src/dto/product.dto";
 import { firstValueFrom } from "rxjs";
 
@@ -25,6 +25,20 @@ export class ProductService {
         console.log(error.response.data); 
 
       throw new BadRequestException(error);
+    }
+  }
+
+  async getAllProduct(authToken:string){
+    try {
+      const result = await firstValueFrom(this.httpService.get(`${this.productServiceUrl}/products`, {
+        headers:{
+          Authorization:authToken
+        }
+      }))
+
+      return result.data
+    } catch (error) {
+      throw new NotFoundException(error)
     }
   }
 }
