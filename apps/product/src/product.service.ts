@@ -20,8 +20,8 @@ export class ProductService implements OnModuleInit {
   constructor(
     @InjectRepository(Product) private readonly productRepository: Repository<Product>,
 
-  @InjectRepository(User)           // ✅ inject User repo directly
-    private readonly userRepository: Repository<User >,
+    @InjectRepository(User) // ✅ inject User repo directly
+    private readonly userRepository: Repository<User>,
 
     @Inject(KAFKA_SERVICE) private readonly kafkaClient: ClientKafka
   ) {}
@@ -43,15 +43,16 @@ export class ProductService implements OnModuleInit {
       //   throw new BadRequestException("number must not be less than 0");
       // }
 
-        const user = await this.userRepository.findOne({ where: { id: userId } });
+      const user = await this.userRepository.findOne({ where: { id: userId } });
 
-    if (!user) {
-      throw new NotFoundException("User not found");
-    }
+      if (!user) {
+        throw new NotFoundException("User not found");
+      }
 
       const newProduct = this.productRepository.create({
         ...createProductDto,
-user      });
+        user
+      });
 
       await this.productRepository.save(newProduct);
       this.kafkaClient.emit(KAFKA_TOPICS.PRODUCT_CREATED, {
@@ -68,22 +69,23 @@ user      });
       throw new BadRequestException("Internal server error");
     }
   }
-async getAllProducts() {
-  const products = await this.productRepository.find({
-    order: {
-      createdAt: "ASC"
+  async getAllProducts() {
+    const products = await this.productRepository.find({
+      order: {
+        createdAt: "ASC"
+      }
+    });
+
+    if (!products || !products.length) {
+      throw new BadRequestException("cant fetch product");
     }
-  });
 
-  if (!products || !products.length) {
-    throw new BadRequestException("cant fetch product");
+    return {
+      success: true,
+      products,
+      totalProduct: products.length
+    };
   }
-
-  return {
-    success: true,
-    products
-  };
-}
 
   async getSingleProduct(id: string) {
     const product = await this.productRepository.findOne({

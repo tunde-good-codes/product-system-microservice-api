@@ -1,8 +1,20 @@
-import { BadRequestException, Body, Controller, Get, Logger, Param, Post, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Post,
+  UseGuards
+} from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CurrentUser } from "libs/shared/src/decorators/current-user.decorator";
 import { JwtAuthGuard } from "@app/common/guards/jwt.authGuard";
 import { CreateProductDto } from "./dto/product.dto";
+import { RolesGuard } from "libs/shared/src/guards/role.guard";
+import { Roles } from "libs/shared/src/decorators/role.decorator";
+import { Role } from "@app/common/enum.types";
 
 @Controller("products")
 export class ProductController {
@@ -14,7 +26,8 @@ export class ProductController {
     return this.productService.getHello();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Post()
   async createProduct(@Body() createProductDto: CreateProductDto, @CurrentUser("id") id: string) {
     try {
@@ -22,7 +35,7 @@ export class ProductController {
     } catch (error) {
       this.logger.log("USER ID:", id);
       this.logger.log("BODY:", createProductDto);
-    throw new BadRequestException(error)
+      throw new BadRequestException(error);
     }
   }
 
@@ -34,6 +47,6 @@ export class ProductController {
 
   @Get(":id")
   async getSingleProduct(@Param("id") id: string) {
-   return await this.productService.getSingleProduct(id);
+    return await this.productService.getSingleProduct(id);
   }
 }

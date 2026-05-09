@@ -72,6 +72,7 @@
         "tsConfigPath": "apps/media/tsconfig.app.json"
       }
     },
+
     "nestjs-microservices": {
       "type": "application",
       "root": "apps/nestjs-microservices",

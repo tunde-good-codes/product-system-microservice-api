@@ -41,4 +41,13 @@ export class ProductService {
       throw new NotFoundException(error)
     }
   }
+
+  async getSingleProduct(productId:string){
+    try {
+      const product = await firstValueFrom(this.httpService.get(`${this.productServiceUrl}/products/${productId}`))
+      return product.data
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
+  }
 }
