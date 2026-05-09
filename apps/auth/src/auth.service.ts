@@ -78,7 +78,8 @@ export class AuthService implements OnModuleInit {
           email: true,
           name: true,
           password: true,
-          refreshToken: true
+          refreshToken: true,
+          role: true
         }
       });
 
@@ -113,8 +114,15 @@ export class AuthService implements OnModuleInit {
     }
   }
 
-  async getHello() {
-    return "hello";
+  async getAllUsers() {
+    const users = await this.userRepository.find({});
+    if (!users) {
+      throw new NotFoundException("no users found!");
+    }
+    return {
+      success: true,
+      data: users
+    };
   }
   private async generateToken(
     userId: string,

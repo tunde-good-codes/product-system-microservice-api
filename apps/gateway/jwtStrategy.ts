@@ -28,9 +28,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       select: {
         id: true,
         email: true,
-        name: true
+        name: true, role:true
       }
     });
+console.log(user);
 
     if (!user) {
       throw new UnauthorizedException("Unauthorized user!");

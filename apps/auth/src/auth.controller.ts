@@ -25,8 +25,9 @@ export class AuthController {
   }
 
   @Get()
-  getHello() {
-    return this.authService.getHello();
+  @UseGuards(JwtAuthGuard)
+  getUsers() {
+    return this.authService.getAllUsers();
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

@@ -29,7 +29,18 @@ export class AuthService {
       this.handleError(e);
     }
   }
-
+  async getUsers(authToken:string) {
+    try {
+      const result = await firstValueFrom(this.httpService.get(`${this.authServer}`, {
+        headers:{
+          Authorization:authToken
+        }
+      }));
+      return result.data;
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
   async getHello() {
     try {
       const result = await firstValueFrom(this.httpService.get(`${this.authServer}`));
@@ -43,7 +54,6 @@ export class AuthService {
   }
 
   async getUserProfile(authHeader: string) {
-
     try {
       const result = await firstValueFrom(
         this.httpService.get(`${this.authServer}/profile`, {
