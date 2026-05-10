@@ -6,7 +6,6 @@ import { Product } from "./entity/product.entity";
 import { KafkaModule } from "@app/kafka";
 import { DatabaseModule } from "@app/database";
 import { ConfigModule } from "@nestjs/config";
-import { AuthModule } from "apps/auth/src/auth.module";
 import { User } from "apps/auth/src/entities/users.entity";
 import { JwtStrategy } from "apps/auth/src/jwtStrategy";
 

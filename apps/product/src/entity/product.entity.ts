@@ -1,5 +1,12 @@
 import { User } from "apps/auth/src/entities/users.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 
 export enum ProductStatus {
   DRAFT = "DRAFT",
@@ -33,6 +40,12 @@ export class Product {
     nullable: true
   })
   imageUrl?: string;
+
+  @Column({
+    type: "varchar",
+    nullable: true
+  })
+  mediaId?: string;
   @Column({
     type: "enum",
     enum: ProductStatus,
@@ -42,9 +55,9 @@ export class Product {
 
   @ManyToOne(() => User, (user) => user.products, { eager: true })
   user: User;
-@CreateDateColumn()
-createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-@UpdateDateColumn()
-updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

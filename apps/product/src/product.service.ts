@@ -30,44 +30,48 @@ export class ProductService implements OnModuleInit {
   }
 
   async onModuleInit() {
+    this.kafkaClient.subscribeToResponseOf(KAFKA_TOPICS.MEDIA_ATTACHED);
+
     await this.kafkaClient.connect();
   }
 
-  async createProduct(createProductDto: CreateProductDto, userId: string) {
+  async createProduct(
+    createProductDto: CreateProductDto,
+    userId: string,
+    file?: Express.Multer.File
+  ) {
     try {
-      // if (
-      //   createProductDto.price < 0 ||
-      //   typeof createProductDto.price !== "number" ||
-      //   Number.isNaN(createProductDto.price)
-      // ) {
-      //   throw new BadRequestException("number must not be less than 0");
-      // }
-
       const user = await this.userRepository.findOne({ where: { id: userId } });
-
-      if (!user) {
-        throw new NotFoundException("User not found");
-      }
+      if (!user) throw new NotFoundException("User not found");
 
       const newProduct = this.productRepository.create({
         ...createProductDto,
         user
       });
-
       await this.productRepository.save(newProduct);
+
+      // Emit with image data attached so media service can upload
       this.kafkaClient.emit(KAFKA_TOPICS.PRODUCT_CREATED, {
         id: newProduct.id,
         name: newProduct.name,
-        price: newProduct.price
+        price: newProduct.price,
+        ...(file && {
+          imageBase64: file.buffer.toString("base64"),
+          imageMimetype: file.mimetype,
+          imageFilename: file.originalname,
+          uploadedByUserId: userId
+        })
       });
 
-      return {
-        success: true,
-        product: newProduct
-      };
+      return { success: true, product: newProduct };
     } catch (e) {
-      throw new BadRequestException("Internal server error");
+      throw e; // don't swallow the original error
     }
+  }
+
+  // product.service.ts — add this method
+  async updateProductImageUrl(productId: string, imageUrl: string, mediaId:string) {
+    await this.productRepository.update(productId, { imageUrl, mediaId });
   }
   async getAllProducts() {
     const products = await this.productRepository.find({

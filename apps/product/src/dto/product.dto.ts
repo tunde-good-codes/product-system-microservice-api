@@ -40,6 +40,10 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  @IsOptional()
+@IsString()
+mediaId?: string;
 }
 
 export class GetProductByIdDto {
