@@ -51,7 +51,7 @@ export class AuthService implements OnModuleInit {
 
       const tokens = await this.generateToken(user.id, user.email, user.role);
       await this.updateRefreshToken(user.id, tokens.refreshToken);
-
+      await this.updateAdmin(user.id, user.role);
       this.kafkaClient.emit(KAFKA_TOPICS.USER_REGISTERED, {
         name: user.name,
         email: user.name,
@@ -181,6 +181,20 @@ export class AuthService implements OnModuleInit {
       success: true,
       user
     };
+  }
+
+  private async updateAdmin(userId: string, admin: string) {
+    let checkAdmin: boolean;
+
+    if (admin === "admin" || "ADMIN") {
+      checkAdmin = true;
+    }
+    {
+      checkAdmin = false;
+    }
+    await this.userRepository.update(userId, {
+      isAdmin: checkAdmin
+    });
   }
   private async updateRefreshToken(userId: string, refreshToken: string) {
     await this.userRepository.update(

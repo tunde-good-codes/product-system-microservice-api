@@ -1,3 +1,4 @@
+import { DatabaseModule } from '@app/database';
 import { Module } from "@nestjs/common";
 import { MediaController } from "./media.controller";
 import { MediaService } from "./media.service";
@@ -12,7 +13,7 @@ import { KafkaModule } from "@app/kafka";
       isGlobal: true,
       envFilePath: ".env"
     }),
-    TypeOrmModule.forFeature([Media]),
+    TypeOrmModule.forFeature([Media]), DatabaseModule,
     KafkaModule.register("media-service-group")
   ],
   controllers: [MediaController],

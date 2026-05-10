@@ -16,6 +16,8 @@ export class CreateProductDto {
 
   @IsOptional()
   @MinLength(3)
+  @IsString()
+
   @MaxLength(600)
   description: string;
 

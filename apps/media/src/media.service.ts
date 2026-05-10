@@ -6,7 +6,6 @@ import { Repository } from "typeorm";
 import { KAFKA_SERVICE } from "@app/kafka";
 import { ClientKafka } from "@nestjs/microservices";
 import { UploadProductImageDto } from "./dto/uploadProductImage.dto";
-import { User } from "apps/auth/src/entities/users.entity";
 import { KAFKA_TOPICS } from "@app/kafka/constants/kafka.topics";
 
 @Injectable()
@@ -20,8 +19,6 @@ export class MediaService {
     @Inject(KAFKA_SERVICE)
     private readonly kafkaClient: ClientKafka,
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>
   ) {}
 // media.service.ts
 async uploadProductImage(uploadProductImage: UploadProductImageDto & { productId?: string }) {

@@ -1,15 +1,28 @@
-import { Body, Controller, ForbiddenException, Get, Headers, Param, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Headers,
+  Param,
+  Post,
+  UploadedFile,
+  UseInterceptors
+} from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "apps/product/src/dto/product.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("products")
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor("image"))
   async createProduct(
     @Body() createProductDto: CreateProductDto,
-    @Headers("authorization") authToken: string
+    @Headers("authorization") authToken: string,
+    @UploadedFile() file: Express.Multer.File | undefined
   ) {
     let token;
     if (authToken) {
@@ -18,7 +31,7 @@ export class ProductController {
       throw new ForbiddenException("auth token missing");
     }
 
-    return await this.productService.createProduct(createProductDto, token);
+    return await this.productService.createProduct(createProductDto, file, token);
   }
 
   @Get()

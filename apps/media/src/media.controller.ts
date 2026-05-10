@@ -8,34 +8,36 @@ import { MessagePattern, Payload } from "@nestjs/microservices";
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
-
   @Get("upload-image")
   async uploadProductImage(@Body() uploadProductImageDto: UploadProductImageDto) {
     return await this.mediaService.uploadProductImage(uploadProductImageDto);
   }
+@MessagePattern(KAFKA_TOPICS.PRODUCT_CREATED)
+async handleProductCreated(
+  @Payload()
+  payload: {
+    id: string;
+    imageBase64?: string;
+    imageMimetype?: string;
+    imageFilename?: string;
+    uploadedByUserId?: string;
+  }
+) {
+  
 
-
-  @MessagePattern(KAFKA_TOPICS.PRODUCT_CREATED)
-  async handleProductCreated(
-    @Payload()
-    payload: {
-      id: string;
-      imageBase64?: string;
-      imageMimetype?: string;
-      imageFilename?: string;
-      uploadedByUserId?: string;
-    }
-  ) {
-    // Only process if an image was included
-    if (!payload.imageBase64 || !payload.imageMimetype) return;
-
-    await this.mediaService.uploadProductImage({
-      base64: payload.imageBase64,
-      mimetype: payload.imageMimetype,
-      filename: payload.imageFilename ?? "upload",
-      uploadByUserId: payload.uploadedByUserId ?? "",
-      productId: payload.id,   // ← we have productId now!
-    });
+  if (!payload.imageBase64 || !payload.imageMimetype) {
+    console.log("No image provided");
+    return;
   }
 
+  await this.mediaService.uploadProductImage({
+    base64: payload.imageBase64,
+    mimetype: payload.imageMimetype,
+    filename: payload.imageFilename ?? "upload",
+    uploadByUserId: payload.uploadedByUserId ?? "",
+    productId: payload.id,
+  });
+
+  console.log("Image uploaded successfully");
+}
 }
