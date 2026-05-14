@@ -18,6 +18,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true
     })
   );
+  app.startAllMicroservices()
   await app.listen(SERVICES_PORTS.CATALOG_SERVICE);
   logger.log(`catalog service running on port: ${SERVICES_PORTS.CATALOG_SERVICE} `);
 }
