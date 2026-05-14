@@ -55,6 +55,7 @@ export class ProductService implements OnModuleInit {
         id: newProduct.id,
         name: newProduct.name,
         price: newProduct.price,
+        userId,
         ...(file && {
           imageBase64: file.buffer.toString("base64"),
           imageMimetype: file.mimetype,

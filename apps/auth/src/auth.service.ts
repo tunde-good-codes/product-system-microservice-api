@@ -79,7 +79,8 @@ export class AuthService implements OnModuleInit {
           name: true,
           password: true,
           refreshToken: true,
-          role: true
+          role: true,
+          isAdmin: true
         }
       });
 
@@ -183,17 +184,9 @@ export class AuthService implements OnModuleInit {
     };
   }
 
-  private async updateAdmin(userId: string, admin: string) {
-    let checkAdmin: boolean;
-
-    if (admin === "admin" || "ADMIN") {
-      checkAdmin = true;
-    }
-    {
-      checkAdmin = false;
-    }
+  private async updateAdmin(userId: string, role: string) {
     await this.userRepository.update(userId, {
-      isAdmin: checkAdmin
+      isAdmin: role === "ADMIN"
     });
   }
   private async updateRefreshToken(userId: string, refreshToken: string) {
