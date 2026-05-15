@@ -20,7 +20,7 @@ export class ProductService implements OnModuleInit {
   constructor(
     @InjectRepository(Product) private readonly productRepository: Repository<Product>,
 
-    @InjectRepository(User) // ✅ inject User repo directly
+    @InjectRepository(User) 
     private readonly userRepository: Repository<User>,
 
     @Inject(KAFKA_SERVICE) private readonly kafkaClient: ClientKafka
